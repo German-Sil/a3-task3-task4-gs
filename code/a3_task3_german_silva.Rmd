@@ -1,0 +1,47 @@
+---
+title: 'Task 3: Santa Barbara Urchins (SILVA)'
+author: "German Silva"
+date: "10/23/2021"
+output: html_document
+---
+# Overview
+
+
+**Data Source**: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# Attach packages
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+### Data visualization of size distribution between two colors of urchin
+- Read in `urchin.csv`
+- Clean names
+- Separate names to obtain color column 
+- Group by color 
+- Create histogram of size distribution
+  - reduce the number of bins
+```{r}
+urchins <- read_csv(here("data", "urchins.csv")) %>% # read in the data
+  clean_names() %>% # clean names into lower_snakecase with clean_names()
+  separate(col = common_name, # state which column we want split up
+           into= c("color_type", "animal"), # state what you want the new columns to be
+           sep = " ", # which separator is being used to make the columns
+           remove = FALSE) %>%  # we are not removing the original column
+  group_by(color_type) # create groups based on color
+
+ggplot(urchins, aes(x = size, fill = color_type))+
+  geom_histogram(bins = 10, alpha= 0.5, position = "identity") +
+  scale_color_manual(values = c("darkorchid4", "darkred")) +
+  scale_fill_manual(values = c("darkorchid4", "darkred")) +
+  labs(x = "Urchin Diameter in cm",
+       y = "Number of Observations",
+       fill = "Color of Urchin") +
+  ggtitle("Difference in Size Distribution in Red and Purple Urchins (SILVA)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
