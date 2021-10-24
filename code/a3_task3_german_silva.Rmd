@@ -41,7 +41,7 @@ ggplot(urchins, aes(x = size, fill = color_type))+
   labs(x = "Urchin Diameter in cm",
        y = "Number of Observations",
        fill = "Color of Urchin") +
-  ggtitle("Difference in Size Distribution in Red and Purple Urchins (SILVA)") +
+  ggtitle("Difference in Size Distribution of Red and Purple Urchins (SILVA)") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
