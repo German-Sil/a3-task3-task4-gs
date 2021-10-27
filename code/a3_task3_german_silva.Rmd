@@ -16,9 +16,12 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(tidyverse)
 library(here)
 library(janitor)
+library(kableExtra)
 ```
 
-### Data visualization of size distribution between two colors of urchin
+## Section 1: Size Comparisons between two species of sea urchins
+
+### Data visualization of size distribution between two types of urchin
 - Read in `urchin.csv`
 - Clean names
 - Separate names to obtain color column 
@@ -32,16 +35,41 @@ urchins <- read_csv(here("data", "urchins.csv")) %>% # read in the data
            into= c("color_type", "animal"), # state what you want the new columns to be
            sep = " ", # which separator is being used to make the columns
            remove = FALSE) %>%  # we are not removing the original column
-  group_by(color_type) # create groups based on color
+  group_by(common_name) # create groups based on species common name
 
-ggplot(urchins, aes(x = size, fill = color_type))+
+ggplot(urchins, aes(x = size, fill = common_name))+
   geom_histogram(bins = 10, alpha= 0.5, position = "identity") +
+  facet_wrap(~ common_name) +
   scale_color_manual(values = c("darkorchid4", "darkred")) +
   scale_fill_manual(values = c("darkorchid4", "darkred")) +
   labs(x = "Urchin Diameter in cm",
        y = "Number of Observations",
-       fill = "Color of Urchin") +
-  ggtitle("Difference in Size Distribution of Red and Purple Urchins (SILVA)") +
-  theme(plot.title = element_text(hjust = 0.5))
+       fill = "Type of Urchin \n(common name)",
+       caption = "Fig. 1 Histograms showing the size distribution of two different species of urchin (red urchin and \npurple urchin). Purple urchin have smaller body sizes than red urchins and have less spread in \ndata than their red counterparts. Table 1 shows numeric values to be used for further comparison ") +
+  ggtitle("Size Distribution of Red and Purple Urchins (SILVA)") +
+  theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0))
 ```
 
+### Descriptive Stats table
+- Create a finalized stats table including:
+  - mean
+  - median
+  - standard deviation
+  - sample size
+  
+```{r}
+urchins_stats <- urchins %>% 
+  group_by(common_name, scientific_name) %>% 
+  summarize(mean_diameter_cm = round(mean(size), 2),
+            median_diameter_cm = median(size),
+            sd_cm = round(sd(size), 2),
+            sample_size = n())
+
+kable(urchins_stats, caption = "**Table 1** Urchin Size Statistics Table")
+
+```
+
+# 
+
+**Takeaway Points**: 
+Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple Urchins (*Strongylocentrotus purpuratus*) as show by the difference in mean (`r urchins_stats$mean_diameter_cm[2]` cm vs. `r urchins_stats$mean_diameter_cm[1]` cm) and median size (`r urchins_stats$median_diameter_cm[2]` cm vs. `r urchins_stats$median_diameter_cm[1]` cm). Actual mean difference is `r urchins_stats$mean_diameter_cm[2] - urchins_stats$mean_diameter_cm[1]` cm, or a % difference of `r round((urchins_stats$mean_diameter_cm[2] / urchins_stats$mean_diameter_cm[1]) * 100, 1) - 100` %. As shown by standard deviations (`r urchins_stats$sd_cm[2]` vs. `r urchins_stats$sd_cm[1]`), Red Urchins size distribution is more spread out compared to that of Purple Urchins.    
