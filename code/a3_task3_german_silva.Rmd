@@ -73,3 +73,18 @@ kable(urchins_stats, caption = "**Table 1** Urchin Size Statistics Table")
 
 **Takeaway Points**: 
 Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple Urchins (*Strongylocentrotus purpuratus*) as show by the difference in mean (`r urchins_stats$mean_diameter_cm[2]` cm vs. `r urchins_stats$mean_diameter_cm[1]` cm) and median size (`r urchins_stats$median_diameter_cm[2]` cm vs. `r urchins_stats$median_diameter_cm[1]` cm). Actual mean difference is `r urchins_stats$mean_diameter_cm[2] - urchins_stats$mean_diameter_cm[1]` cm, or a % difference of `r round((urchins_stats$mean_diameter_cm[2] / urchins_stats$mean_diameter_cm[1]) * 100, 1) - 100` %. As shown by standard deviations (`r urchins_stats$sd_cm[2]` vs. `r urchins_stats$sd_cm[1]`), Red Urchins size distribution is more spread out compared to that of Purple Urchins.    
+
+
+## Section 2: Exploring purple urchin count by site and year
+
+- Create a stored subset of the data in an object called `purple_urchins`
+- Write code that will create a table of total number of urchins per site by year
+- Finalize a graph showing purple urchins recorded by site over time
+  - Include caption
+- Add text below graph explaining graph/what would be needed to explain changes in urchins
+- Knit document
+
+```{r}
+
+```
+
