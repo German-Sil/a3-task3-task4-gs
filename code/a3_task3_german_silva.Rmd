@@ -78,6 +78,10 @@ Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple
 ## Section 2: Exploring purple urchin count by site and year
 
 - Create a stored subset of the data in an object called `purple_urchins`
+  - `filter()` for purple urchins
+  - convert `date` to class "date"
+  - create new column for `year` only
+  - create new column for `site_full` that has full names of sites
 - Write code that will create a table of total number of urchins per site by year
 - Finalize a graph showing purple urchins recorded by site over time
   - Include caption
