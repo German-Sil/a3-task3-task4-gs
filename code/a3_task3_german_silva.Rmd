@@ -17,6 +17,7 @@ library(tidyverse)
 library(here)
 library(janitor)
 library(kableExtra)
+library(lubridate)
 ```
 
 ## Section 1: Size Comparisons between two species of sea urchins
@@ -31,10 +32,6 @@ library(kableExtra)
 ```{r}
 urchins <- read_csv(here("data", "urchins.csv")) %>% # read in the data
   clean_names() %>% # clean names into lower_snakecase with clean_names()
-  separate(col = common_name, # state which column we want split up
-           into= c("color_type", "animal"), # state what you want the new columns to be
-           sep = " ", # which separator is being used to make the columns
-           remove = FALSE) %>%  # we are not removing the original column
   group_by(common_name) # create groups based on species common name
 
 ggplot(urchins, aes(x = size, fill = common_name))+
@@ -89,6 +86,15 @@ Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple
 - Knit document
 
 ```{r}
-
+purple_urchins <- urchins %>% 
+  filter(common_name == "Purple Urchin") %>%
+  mutate(date = mdy(date)) %>% 
+  mutate(year = year(date)) %>% 
+  mutate(site_full = case_when(
+    site == "NAPL" ~ "Naples Reef",
+    site == "AQUE" ~ "Arroyo Quemado Reef",
+    site == "CARP" ~ "Carpinteria Reef",
+    site == "MOHK" ~ "Mohawk Reef",
+    site == "IVEE" ~ "Isla Vista Reef"))
 ```
 

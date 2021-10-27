@@ -181,7 +181,8 @@ pre code {
 library(tidyverse)
 library(here)
 library(janitor)
-library(kableExtra)</code></pre>
+library(kableExtra)
+library(lubridate)</code></pre>
 <div id="section-1-size-comparisons-between-two-species-of-sea-urchins" class="section level2">
 <h2>Section 1: Size Comparisons between two species of sea urchins</h2>
 <div id="data-visualization-of-size-distribution-between-two-types-of-urchin" class="section level3">
@@ -198,10 +199,6 @@ library(kableExtra)</code></pre>
 </ul>
 <pre class="r"><code>urchins &lt;- read_csv(here(&quot;data&quot;, &quot;urchins.csv&quot;)) %&gt;% # read in the data
   clean_names() %&gt;% # clean names into lower_snakecase with clean_names()
-  separate(col = common_name, # state which column we want split up
-           into= c(&quot;color_type&quot;, &quot;animal&quot;), # state what you want the new columns to be
-           sep = &quot; &quot;, # which separator is being used to make the columns
-           remove = FALSE) %&gt;%  # we are not removing the original column
   group_by(common_name) # create groups based on species common name
 
 ggplot(urchins, aes(x = size, fill = common_name))+
@@ -329,6 +326,10 @@ Mesocentrotus franciscanus
 <li>Add text below graph explaining graph/what would be needed to explain changes in urchins</li>
 <li>Knit document</li>
 </ul>
+<pre class="r"><code>purple_urchins &lt;- urchins %&gt;% 
+  filter(common_name == &quot;Purple Urchins&quot;) %&gt;% 
+  mutate(site_full = site,
+         )</code></pre>
 </div>
 </div>
 
