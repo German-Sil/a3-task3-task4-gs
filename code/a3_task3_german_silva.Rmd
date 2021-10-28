@@ -6,6 +6,7 @@ output: html_document
 ---
 # Overview
 
+This code looks at sea urchin data from Santa Barbara, CA as an example and exercise in data wrangling and data visualization. Examples include: cleaning names, relative file paths, faceted graphs with captions, tables, and changing data class. Two sections exist: 1) Size distribution comparisons between two sea urchin species and 2) observations at different sites over time for Purple Urchins.
 
 **Data Source**: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
 
@@ -29,22 +30,22 @@ library(lubridate)
 - Group by color 
 - Create histogram of size distribution
   - reduce the number of bins
-```{r}
+```{r, fig.cap= "**Figure 1** Histograms showing the size distribution of two different species of urchin (red urchin and purple urchin). Purple urchin have smaller body sizes than red urchins and have less spread in data than their red counterparts. Table 1 shows numeric values to be used for further comparison"} 
+# fig.cap = adds the caption to the knitted figure
 urchins <- read_csv(here("data", "urchins.csv")) %>% # read in the data
   clean_names() %>% # clean names into lower_snakecase with clean_names()
   group_by(common_name) # create groups based on species common name
 
-ggplot(urchins, aes(x = size, fill = common_name))+
-  geom_histogram(bins = 10, alpha= 0.5, position = "identity") +
-  facet_wrap(~ common_name) +
-  scale_color_manual(values = c("darkorchid4", "darkred")) +
-  scale_fill_manual(values = c("darkorchid4", "darkred")) +
-  labs(x = "Urchin Diameter in cm",
-       y = "Number of Observations",
-       fill = "Type of Urchin \n(common name)",
-       caption = "Fig. 1 Histograms showing the size distribution of two different species of urchin (red urchin and \npurple urchin). Purple urchin have smaller body sizes than red urchins and have less spread in \ndata than their red counterparts. Table 1 shows numeric values to be used for further comparison ") +
-  ggtitle("Size Distribution of Red and Purple Urchins (SILVA)") +
-  theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0))
+ggplot(urchins, aes(x = size, fill = common_name))+ # open the data and set the histogram variable and what to color by
+  geom_histogram(bins = 12, position = "identity") + # set bins to 12 for a better visualization for this data, a personal choice of mine to always use "identity" as the position.
+  facet_wrap(~ common_name) + # set what to facet the graphs by
+  scale_color_manual(values = c("darkorchid4", "darkred")) + # set outline colors manually
+  scale_fill_manual(values = c("darkorchid4", "darkred")) + # set fill colors for bars manually
+  labs(x = "Urchin Diameter (cm)", # x-axis label
+       y = "Number of Observations") + # y-axis label
+  ggtitle("Size Distribution of Red and Purple Urchins (SILVA)") + # graph title
+  theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0)) + # sets the center and left justifications for the title and caption. 
+  guides(fill= "none") # removes legend to reduce clutter and compression
 ```
 
 ### Descriptive Stats table
@@ -55,14 +56,14 @@ ggplot(urchins, aes(x = size, fill = common_name))+
   - sample size
   
 ```{r}
-urchins_stats <- urchins %>% 
-  group_by(common_name, scientific_name) %>% 
-  summarize(mean_diameter_cm = round(mean(size), 2),
-            median_diameter_cm = median(size),
-            sd_cm = round(sd(size), 2),
-            sample_size = n())
+urchins_stats <- urchins %>% # read in data
+  group_by(common_name, scientific_name) %>% # group by common_name and scientific_name (i wanted both those details to remain in the summary table)
+  summarize(mean_diameter_cm = round(mean(size), 2), # set the mean parameter as a rounded mean up to 2 decimal spots
+            median_diameter_cm = median(size), # set the median parameter as a rounded median up to 2 decimal spots
+            sd_cm = round(sd(size), 2), # set the sd parameter as a rounded sd up to 2 decimal spots
+            sample_size = n()) # obtain observations
 
-kable(urchins_stats, caption = "**Table 1** Urchin Size Statistics Table")
+kable(urchins_stats, caption = "**Table 1** Urchin Size Statistics Table") # makes a table with a table caption
 
 ```
 
@@ -85,29 +86,31 @@ Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple
 - Add text below graph explaining graph/what would be needed to explain changes in urchins
 - Knit document
 
-```{r}
-purple_urchins <- urchins %>% 
-  filter(common_name == "Purple Urchin") %>%
-  mutate(date = mdy(date)) %>% 
-  mutate(year = year(date)) %>% 
-  mutate(site_full = case_when(
+```{r, fig.cap= "**Figure 2** Bar charts showing the change in Purple Urchins observed at each site from 2008-2020. Overall, urchin populations have seemingly been on the decline since observations started. Note: Isla Vista Reef observations start in 2012 opposed to 2008."}
+purple_urchins <- urchins %>% # set the data we are working with
+  filter(common_name == "Purple Urchin") %>% # filter to obtain only Purple Urchin rows
+  mutate(date = mdy(date)) %>% # change the date column to class = Date
+  mutate(year = year(date)) %>% # create a year coloumn
+  mutate(site_full = case_when( # set a "if_else" like statement to make a column with full site names
     site == "NAPL" ~ "Naples Reef",
     site == "AQUE" ~ "Arroyo Quemado Reef",
     site == "CARP" ~ "Carpinteria Reef",
     site == "MOHK" ~ "Mohawk Reef",
     site == "IVEE" ~ "Isla Vista Reef"))
 
-purple_urchin_sites <- purple_urchins %>% 
-  group_by(site_full, year) %>% 
-  summarise(observed = n())
+purple_urchin_sites <- purple_urchins %>% # read in the purple urchin data
+  group_by(site_full, year) %>% # group by the two variables we want to use in our analysis (site and year)
+  summarise(observed = n()) # makes a table with the total observations by year and site
 
-ggplot(data = purple_urchin_sites, aes(x = year, y = observed)) +
-  geom_bar(aes(fill = site_full), stat = "identity") +
-  facet_wrap(~ site_full, scales = 'free') +
-  labs(x= "Year",
-       y = "Number of Observed Purple Urchins")+
-  ggtitle("Purple Urchin Observations Over Time Across Study Sites (SILVA)") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  guides(fill = FALSE)
+ggplot(data = purple_urchin_sites, aes(x = year, y = observed)) + # sets what data will be graphed
+  geom_bar(aes(fill = site_full), stat = "identity") + # colors plots by site and allows geom_bar to use two aes() variables
+  facet_wrap(~ site_full, scales = 'free') + # makes faceted plots by site and allows each to have its own axes. 
+  labs(x= "Year", # changes name of x axis
+       y = "Number of Observed Purple Urchins")+ # changes names of y-axis
+  ggtitle("Purple Urchin Observations Over Time Across Study Sites (SILVA)") + # title of graphs
+  theme(plot.title = element_text(hjust = 0.5)) + # centers graph
+  guides(fill = "none") # removes legend as to not compress the plots
 ```
+#
 
+Purple Urchin populations seem to be on the decline by looking on the graphs. However, you have to take in account the sampling method, scope, and team behind the data collection before assuming this is representative of true population decline. For example, the scope of the data does not appear to focus on estimating population size like a catch-tag-release-recapture method would (as there is no recapture/initial capture columns). Other explanations for the apparent decline could be fewer people able to go out to sample or cloudy water condition, for example.
