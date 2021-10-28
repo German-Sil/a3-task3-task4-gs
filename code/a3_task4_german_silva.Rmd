@@ -21,6 +21,7 @@ library(tidyverse)
 library(here)
 library(janitor)
 library(lubridate)
+library(kableExtra)
 ```
 
 # Data Exploration
@@ -41,5 +42,33 @@ naples_reef_2010 <- read_csv(here("data", "urchins.csv")) %>% # read in the csv
   filter(common_name == "Purple Urchin",
          year == "2010",
          site == "NAPL")
+```
+
+## Explore the data via faceted histograms and Q-Q plots
+
+```{r}
+ggplot(naples_reef_2010, aes(x= size)) +
+  geom_histogram(bins = 10)+
+  facet_wrap(~treatment)
+
+ggplot(naples_reef_2010, aes(sample = size)) +
+  geom_qq()+
+  facet_wrap(~treatment)
+```
+#
+
+**Takeaway Points**: 
+Looking at both the histograms and the Q-Q plots, it appears that the data is fairly close to normally distributed (Q-Q plots have an overall linear trend). Urchins in the annual kelp removal treatment have a central tendency lower than that of the control group. 
+
+## Summary Statistics Table
+
+```{r}
+naples_2010_stats <- naples_reef_2010 %>% 
+  group_by(treatment) %>% 
+  summarize(mean_diameter_cm = round(mean(size), 2),
+            median_diameter_cm = round(median(size), 2),
+            sd_cm = round(sd(size), 2),
+            sample_size = n())
+
 ```
 
