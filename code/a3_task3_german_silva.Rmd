@@ -74,7 +74,7 @@ Red Urchins (*Mesocentrotus franciscanus*) are larger in size compared to Purple
 
 ## Section 2: Exploring purple urchin count by site and year
 
-- Create a stored subset of the data in an object called `purple_urchins`
+- Create a stored subset of the data in an object called `purple_urchins` 
   - `filter()` for purple urchins
   - convert `date` to class "date"
   - create new column for `year` only
@@ -96,5 +96,18 @@ purple_urchins <- urchins %>%
     site == "CARP" ~ "Carpinteria Reef",
     site == "MOHK" ~ "Mohawk Reef",
     site == "IVEE" ~ "Isla Vista Reef"))
+
+purple_urchin_sites <- purple_urchins %>% 
+  group_by(site_full, year) %>% 
+  summarise(observed = n())
+
+ggplot(data = purple_urchin_sites, aes(x = year, y = observed)) +
+  geom_bar(aes(fill = site_full), stat = "identity") +
+  facet_wrap(~ site_full, scales = 'free') +
+  labs(x= "Year",
+       y = "Number of Observed Purple Urchins")+
+  ggtitle("Purple Urchin Observations Over Time Across Study Sites (SILVA)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  guides(fill = FALSE)
 ```
 
