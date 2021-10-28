@@ -1,0 +1,45 @@
+---
+title: "Task 4: Naples Reef Purple Urchins (SILVA)"
+author: "German Silva"
+date: "10/28/2021"
+output: 
+  html_document: 
+    number_sections: yes
+---
+
+# Overview
+
+
+
+**Data Source**: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# Attach packages
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+# Data Exploration
+
+## Create a stored object for purple urchins found at Naples Reef in 2010
+
+- Read in `urchins.csv` using `read_csv()` and `here()`
+- Clean names with `clean_names()`
+- Convert `date` column into `class = Date`
+- Make `year` column with `year()`
+- Subset for purple urchins at Naples reef in 2010 using `filter()`
+
+```{r}
+naples_reef_2010 <- read_csv(here("data", "urchins.csv")) %>% # read in the csv
+  clean_names() %>% # converts column names unto lower_snakecase
+  mutate(date = mdy(date)) %>%  # converts date column into a date class
+  mutate(year = year(date)) %>% # 
+  filter(common_name == "Purple Urchin",
+         year == "2010",
+         site == "NAPL")
+```
+
