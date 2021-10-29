@@ -9,7 +9,7 @@ output:
 
 # Overview
 
-
+This code is for practicing exploratory data visualization with Purple Urchin data from Naples Reef in 2010. The data shows two different plots useful for exploratory data visualization. Data visualization is then followed with a descriptive stats summary table that can be used to discuss characteristics of the data.
 
 **Data Source**: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
 
@@ -26,7 +26,7 @@ library(kableExtra)
 
 # Data Exploration
 
-## Create a stored object for purple urchins found at Naples Reef in 2010
+## Creation of a stored object for purple urchins found at Naples Reef in 2010
 
 - Read in `urchins.csv` using `read_csv()` and `here()`
 - Clean names with `clean_names()`
@@ -38,24 +38,24 @@ library(kableExtra)
 naples_reef_2010 <- read_csv(here("data", "urchins.csv")) %>% # read in the csv
   clean_names() %>% # converts column names unto lower_snakecase
   mutate(date = mdy(date)) %>%  # converts date column into a date class
-  mutate(year = year(date)) %>% # 
+  mutate(year = year(date)) %>% # add a year column
   filter(common_name == "Purple Urchin",
          year == "2010",
-         site == "NAPL")
+         site == "NAPL") # filtering to subset for the conditions we are looking for
 ```
 
-## Explore the data via faceted histograms and Q-Q plots
+## Exploratory Data Visualization
 
 ```{r}
-ggplot(naples_reef_2010, aes(x= size)) +
-  geom_histogram(bins = 10)+
-  facet_wrap(~treatment)
+ggplot(naples_reef_2010, aes(x= size)) + # opens data for graphing
+  geom_histogram(bins = 10)+ # sets it as a histogram with 10 bins
+  facet_wrap(~treatment) # facets it by treatment
 
-ggplot(naples_reef_2010, aes(sample = size)) +
-  geom_qq()+
-  facet_wrap(~treatment)
+ggplot(naples_reef_2010, aes(sample = size)) + # opens data
+  geom_qq()+ # creates a q-q plot
+  facet_wrap(~treatment) # facets the qq plot by treatment
 ```
-#
+
 
 **Takeaway Points**: 
 Looking at both the histograms and the Q-Q plots, it appears that the data is fairly close to normally distributed (Q-Q plots have an overall linear trend). Urchins in the annual kelp removal treatment have a central tendency lower than that of the control group. 
@@ -70,5 +70,7 @@ naples_2010_stats <- naples_reef_2010 %>%
             sd_cm = round(sd(size), 2),
             sample_size = n())
 
+kable(naples_2010_stats, caption = "**Table 1** Central Tendency and Data Spread Statistics for  Purple Urchins at Naples Reef in 2010 by Treatment")
 ```
 
+Urchins in the annual kelp removal treatment have on lower mean ($\bar{x}$ = `r naples_2010_stats$mean_diameter_cm[1]`) and median body diameter (mdn = `r naples_2010_stats$median_diameter_cm[1]`) than those in the control group ($\bar{x}$ = `r naples_2010_stats$mean_diameter_cm[2]`, mdn = `r naples_2010_stats$median_diameter_cm[2]`). Data for the annual kelp removal treatment also have a larger data spread (sd = `r naples_2010_stats$sd_cm[1]`) compared to the control group (sd = `r naples_2010_stats$sd_cm[2]`). 
